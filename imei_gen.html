@@ -1,0 +1,106 @@
+
+<html>
+<head>
+
+</head>
+<body>
+
+<form>
+Enter IMEI:      
+<input type="text" id="input_imei" value="358429063531981" /><br>
+Generations:
+<input type="text" id="input_gens" value="10" /><br>
+
+<input type="checkbox" name="c" id="check_generate" onclick="check(this)" value="IMEI Generation" />IMEI Generation<br>
+<input type="checkbox" name="c" id="check_validity" onclick="check(this)" value="IMEI Validity Test" />IMEI Validity Test<br><br>
+
+<input type="button" name="b" id="button1" onclick="display_luhn()" value="Execute" />
+<input type="button" id="button2" onclick="clear_display()" value="Clear Output" />
+</form>
+
+<p id="imei_display"></p>
+
+</body>
+<script type="text/javascript">
+
+var radio_gen = document.getElementById("check_generate");
+var radio_validate = document.getElementById("check_validity");
+
+function clear_display()
+{
+  document.getElementById("imei_display").innerHTML = "";
+}
+
+function check(val) {
+  if (val.id == "check_generate") {
+  	radio_validate.checked = false;
+  }
+  
+  if (val.id == "check_validity") {
+  	radio_gen.checked = false;
+  }
+   
+}
+
+function luhn_compressed(a, b, c, d, e1) {
+  var e = document.getElementById("input_imei");
+	
+  for(d = +a[b = a.length-1], e=0; b--; )
+     c = +a[b], d += ++e % 2 ? 2 * c %10+(c >4): c;
+  
+  var ret = (d % 10 ==0);
+  //document.getElementById("display_imei").innerHTML = ret;
+  
+  return ret;
+}
+
+function luhn(str)
+{
+	  var luhnArr = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9];
+		var counter = 0;
+		var incNum;
+		var odd = false;
+		var temp = String(str).replace(/[^\d]/g, "");
+		if ( temp.length == 0)
+			return false;
+		for (var i = temp.length-1; i >= 0; --i)
+		{
+			incNum = parseInt(temp.charAt(i), 10);
+			counter += (odd = !odd)? incNum : luhnArr[incNum];
+		}
+		return (counter%10 == 0);
+}
+
+function display_luhn()
+{
+  var gens = Number(document.getElementById("input_gens").value);
+  var digits = document.getElementById("input_imei").value;
+
+  if (document.getElementById("check_validity").checked == true) {
+  	document.getElementById("imei_display").innerHTML = (luhn_compressed(digits) ? "Valid": "InValid");
+  	return;
+  }  
+    
+  if (gens > 1000)
+  {
+    document.getElementById("imei_display").innerHTML = "Number of Generations is too High!";
+    return;
+  }
+  
+  clear_display();
+  
+  for (i = 0; i < gens; i++)
+  {
+	 for (j = 0; j < 10; j++)
+	 {
+		digits = String(Number(digits) + 1);
+	    ret = luhn_compressed(digits);
+	    if (ret)
+		   document.getElementById("imei_display").innerHTML += digits + "<br>";
+	 }
+  }
+   
+}
+
+</script>
+</html>
